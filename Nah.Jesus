@@ -1,0 +1,22 @@
+# Omar7GPT
+
+JesusGPT
+
+> **JesusGPT** | Codename: *Nah.Jesus*  
+> An experimental GPT-based AI that bridges faith, philosophy, and modern LLM tech.
+
+---
+
+## Files
+
+```bash
+backend/     # Auth, API routes, LLM logic
+frontend/    # React app
+run.sh       # Shell script to launch both services
+README.md    # Project overviewgit clone https://github.com/nah7nah/Omar7GPT.git
+cd Omar7GPT
+chmod +x run.sh
+./run.sh
+  Ready to drop that in `README.md` and hit “Commit changes”? Or want to keep iterating?
+
+Let me know if you want me to help scaffold the backend/frontend folders next too.
