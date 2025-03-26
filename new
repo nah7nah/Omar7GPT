@@ -1,0 +1,221 @@
+import 'package:flutter/material.dart';
+import 'pages/home_page.dart';
+
+void main() {
+  runApp(OverflowApp());
+}
+
+class OverflowApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'OverflowApp',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        brightness: Brightness.dark,
+      ),
+      home: HomePage(),
+    );
+  }
+}import 'package:flutter/material.dart';
+import 'journal_page.dart';
+import 'trigger_page.dart';
+import 'prophecy_page.dart';
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('OverflowApp')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Welcome to Overflow', style: TextStyle(fontSize: 24)),
+            SizedBox(height: 20),
+            ElevatedButton(
+              child: Text('Journal'),
+              onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (context) => JournalPage())),
+            ),
+            ElevatedButton(
+              child: Text('Blessing Trigger'),
+              onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (context) => TriggerPage())),
+            ),
+            ElevatedButton(
+              child: Text('Prophetic Voice Mode'),
+              onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ProphecyPage())),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}import 'package:flutter/material.dart';
+import '../models/overflow_entry.dart';
+
+class JournalPage extends StatefulWidget {
+  @override
+  _JournalPageState createState() => _JournalPageState();
+}
+
+class _JournalPageState extends State<JournalPage> {
+  List<OverflowEntry> entries = [];
+
+  final TextEditingController _controller = TextEditingController();
+
+  void _addEntry(String content) {
+    setState(() {
+      entries.add(OverflowEntry(DateTime.now(), content));
+    });
+    _controller.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Overflow Journal')),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(12.0),
+            child: TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Enter new blessing or moment',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    if (_controller.text.isNotEmpty) {
+                      _addEntry(_controller.text);
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: entries.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(entries[index].content),
+                  subtitle: Text(entries[index].timestamp.toLocal().toString()),
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}import 'package:flutter/material.dart';
+
+class TriggerPage extends StatelessWidget {
+  void _simulateTrigger(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Overflow Blessing Triggered!'))
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Blessing Trigger')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.nfc, size: 80),
+            SizedBox(height: 20),
+            Text('Tap or Scan to Trigger Blessing', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 20),
+            ElevatedButton(
+              child: Text('Simulate Trigger'),
+              onPressed: () => _simulateTrigger(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}import 'package:flutter/material.dart';
+import '../services/cody_ai.dart';
+
+class ProphecyPage extends StatefulWidget {
+  @override
+  _ProphecyPageState createState() => _ProphecyPageState();
+}
+
+class _ProphecyPageState extends State<ProphecyPage> {
+  final TextEditingController _controller = TextEditingController();
+  String response = "";
+
+  void _askCody(String input) {
+    final result = CodyAI().getResponse(input);
+    setState(() {
+      response = result;
+    });
+    _controller.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Prophetic Mode')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Ask a question or speak a phrase...',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    if (_controller.text.isNotEmpty) {
+                      _askCody(_controller.text);
+                    }
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            Text(
+              response,
+              style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
+
+class CodyAI {
+  Map<String, dynamic> _declarations = {};
+
+  CodyAI() {
+    _loadDeclarations();
+  }
+
+  void _loadDeclarations() async {
+    String data = await rootBundle.loadString('assets/declarations.json');
+    _declarations = json.decode(data);
+  }
+
+  String getResponse(String input) {
+    input = input.toLowerCase();
+    for (var key in _declarations.keys) {
+      if (input.contains(key.toLowerCase())) {
+        return _declarations[key];
+      }
+    }
+    return "The word has gone out, and it will not return void.";
+  }
+}
