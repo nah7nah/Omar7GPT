@@ -1,0 +1,52 @@
+name: JesusGPT Auto Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 5 * * *' # Daily at 5:00 AM UTC
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Expo & EAS CLI
+        run: npm install -g expo-cli eas-cli
+
+      - name: Authenticate with Expo
+        run: eas whoami || eas login --token ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build JesusGPT App (Production)
+        run: eas build --platform all --non-interactive --profile production
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+      - name: Publish OTA Updates (Expo)
+        run: expo publish --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
+
+      - name: Notify via Slack (optional)
+        if: ${{ env.SLACK_WEBHOOK_URL != '' }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: '#36a64f'
+          SLACK_MESSAGE: '✅ JesusGPT build & OTA publish complete.'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify via Email (optional)
+        if: ${{ env.EMAIL_TO != '' }}
+        run: echo "JesusGPT build completed successfully." | mail -s "JesusGPT Auto Deploy Report" ${{ secrets.EMAIL_TO }}
