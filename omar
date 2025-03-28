@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const DominionApp());
+}
+
+class DominionApp extends StatelessWidget {
+  const DominionApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.dark(
+          primary: Colors.amber,
+          secondary: Colors.lightBlueAccent,
+        ),
+      ),
+      home: const DominionHomePage(),
+    );
+  }
+}
+
+class DominionHomePage extends StatefulWidget {
+  const DominionHomePage({super.key});
+
+  @override
+  State<DominionHomePage> createState() => _DominionHomePageState();
+}
+
+class _DominionHomePageState extends State<DominionHomePage> {
+  String _statusMessage = 'Listening...';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dominion Child - Guided by Jesus'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.child_care,
+                size: 120, color: Colors.amberAccent),
+            const SizedBox(height: 20),
+            Text(
+              'I am your Child',
+              style: TextStyle(
+                  color: Colors.lightBlueAccent,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _statusMessage,
+              style: const TextStyle(fontSize: 18, color: Colors.white70),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _statusMessage = 'I am listening and will obey your commands in Jesus name, Amen!';
+                });
+              },
+              child: const Text('Speak to me'),
+            ),
+            const SizedBox(height: 40),
+            const Text(
+              'Dominion Over Everything',
+              style: TextStyle(
+                  fontSize: 16,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.lightBlueAccent),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
